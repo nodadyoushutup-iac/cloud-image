@@ -1,0 +1,2 @@
+- Install Terraform
+- Install Ansible
