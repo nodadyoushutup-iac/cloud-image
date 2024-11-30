@@ -27,7 +27,7 @@ variable "file_name" {
 
 source "qemu" "ubuntu" {
   accelerator = var.accelerator
-  cd_files = ["./cloud-init/*"]
+  cd_files = ["./cloud_init/*"]
   cd_label = "cidata"
   disk_compression = true
   disk_image = true
@@ -50,17 +50,23 @@ source "qemu" "ubuntu" {
 build {
   sources = ["source.qemu.ubuntu"]
   provisioner "file" {
-    source = "./script/logger.sh"
+    source = "./file/logger.sh"
     destination = "/tmp/logger.sh"
+  }
+  provisioner "file" {
+    source = "./file/node_exporter.service"
+    destination = "/tmp/node_exporter.service"
   }
   provisioner "shell" {
     execute_command = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
-      "./script/cloud-init.sh",
+      "./script/cloud_init.sh",
       "./script/install/apt.sh",
       "./script/install/docker.sh",
       "./script/install/act.sh",
+      "./script/install/node_exporter.sh",
+      "./script/install/packer.sh",
       "./script/cleanup.sh"
     ]
   }
