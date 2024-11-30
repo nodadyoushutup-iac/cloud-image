@@ -1,0 +1,7 @@
+packer_cache/
+output/
+crash.log
+*.pkrvars.hcl
+*.box
+*.img
+*.convert

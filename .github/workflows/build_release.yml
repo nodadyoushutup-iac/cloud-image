@@ -1,0 +1,129 @@
+name: Build and Release Image
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semantic version tag for the release"
+        required: true
+      file_name:
+        description: "File name"
+        required: true
+        default: cloud_image_x86_64_jammy
+        type: choice
+        options:
+          - cloud_image_x86_64_jammy
+
+env:
+  PACKER_LOG: 1
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  VERSION: "${{ github.event.inputs.version }}"
+  FILE_NAME: ${{ github.event.inputs.file_name }}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        id: checkout_build
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Validate tag uniqueness
+        id: validate_tag
+        run: |
+          if git rev-parse "refs/tags/${{ env.VERSION }}" >/dev/null 2>&1; then
+            echo "Error: Tag ${{ env.VERSION }} already exists"
+            exit 1
+          fi
+
+      - name: Install packages
+        id: apt_install
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq qemu-system xorriso
+
+      - name: Packer setup
+        uses: hashicorp/setup-packer@main
+        id: packer_setup
+        with:
+          version: "latest"
+
+      - name: Packer init
+        id: packer_init
+        run: |
+          packer init cloud_image.pkr.hcl
+
+      - name: Packer validate
+        id: packer_validate
+        run: |
+          packer validate cloud_image.pkr.hcl
+
+      - name: Packer build
+        id: packer_build
+        run: |
+          packer build \
+          -var="output_dir=output" \
+          -var="file_name=${{ env.FILE_NAME }}" \
+          cloud_image.pkr.hcl
+
+      - name: Generate checksum
+        id: generate_checksum
+        run: |
+          mkdir -p "output"
+          sha256sum "output/${{ env.FILE_NAME }}.img" > "output/${{ env.FILE_NAME }}.img.sha256"
+
+      - name: Upload artifacts to workspace
+        uses: actions/upload-artifact@v4
+        id: artifact_upload
+        with:
+          name: artifact
+          path: |
+            output/${{ env.FILE_NAME }}.img
+            output/${{ env.FILE_NAME }}.img.sha256
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        id: checkout_release
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        id: artifact_download
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact
+
+      - name: Create GitHub release
+        id: release_create
+        run: |
+          echo "Creating release for tag: ${{ env.VERSION }}"
+          gh release create ${{ env.VERSION }} --title "${{ env.VERSION }}" --notes "Automated release of the cloud image"
+
+      - name: Upload artifact to release
+        id: release_upload_artifact
+        run: |
+          if [[ ! -f "${{ env.FILE_NAME }}.img" ]]; then
+            echo "Error: Artifact not found: ${{ env.FILE_NAME }}.img"
+            exit 1
+          fi
+          echo "Uploading artifact: ${{ env.FILE_NAME }}.img"
+          gh release upload "${{ env.VERSION }}" "${{ env.FILE_NAME }}.img"
+      
+      - name: Upload checksum to release
+        id: release_upload_checksum
+        run: |
+          if [[ ! -f "${{ env.FILE_NAME }}.img.sha256" ]]; then
+            echo "Error: Checksum file not found: ${{ env.FILE_NAME }}.img.sha256"
+            exit 1
+          fi
+          echo "Uploading checksum: ${{ env.FILE_NAME }}.img.sha256"
+          gh release upload "${{ env.VERSION }}" "${{ env.FILE_NAME }}.img.sha256"
