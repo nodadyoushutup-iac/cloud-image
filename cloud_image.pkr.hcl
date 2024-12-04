@@ -49,14 +49,17 @@ source "qemu" "ubuntu" {
 
 build {
   sources = ["source.qemu.ubuntu"]
+  
   provisioner "file" {
     source = "./file/logger.sh"
     destination = "/tmp/logger.sh"
   }
+
   provisioner "file" {
     source = "./file/node_exporter.service"
     destination = "/tmp/node_exporter.service"
   }
+
   provisioner "shell" {
     execute_command = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
