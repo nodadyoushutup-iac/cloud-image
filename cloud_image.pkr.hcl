@@ -49,7 +49,7 @@ source "qemu" "ubuntu" {
 
 build {
   sources = ["source.qemu.ubuntu"]
-  
+
   provisioner "file" {
     source = "./file/logger.sh"
     destination = "/tmp/logger.sh"
@@ -70,6 +70,8 @@ build {
       "./script/install/act.sh",
       "./script/install/node_exporter.sh",
       "./script/install/packer.sh",
+      "./script/install/user_group.sh",
+      "./script/install/directory.sh",
       "./script/cleanup.sh"
     ]
   }
