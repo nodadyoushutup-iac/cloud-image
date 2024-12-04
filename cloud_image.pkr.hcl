@@ -70,8 +70,8 @@ build {
       "./script/install/act.sh",
       "./script/install/node_exporter.sh",
       "./script/install/packer.sh",
-      "./script/install/user_group.sh",
-      "./script/install/directory.sh",
+      "./script/user_group.sh",
+      "./script/directory.sh",
       "./script/cleanup.sh"
     ]
   }
