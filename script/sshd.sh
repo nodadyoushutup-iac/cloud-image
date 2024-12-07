@@ -2,6 +2,7 @@
 
 source /tmp/logger.sh
 
+log_info "Configuring SSH"
 if [ -f /tmp/sshd_config ]; then
     mv /tmp/sshd_config /etc/ssh/sshd_config
 else
