@@ -39,7 +39,4 @@ rm -f /root/.wget-hsts || log_error "Failed to clear wget history"
 log_info "Clearing bash history environment variable"
 export HISTSIZE=0
 
-log_info "Restarting SSH"
-systemctl restart sshd || log_error "Failed to restart SSH"
-
 log_info "System cleanup completed successfully!"

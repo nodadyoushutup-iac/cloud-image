@@ -62,7 +62,7 @@ build {
 
   provisioner "file" {
     source      = "./file/sshd_config"
-    destination = "/etc/ssh/sshd_config"
+    destination = "/tmp/sshd_config"
   }
 
   provisioner "shell" {
@@ -71,6 +71,7 @@ build {
     scripts = [
       "./script/cloud_init.sh",
       "./script/logger.sh",
+      "./script/sshd.sh",
       "./script/install/apt.sh",
       "./script/install/docker.sh",
       "./script/install/act.sh",
