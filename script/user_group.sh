@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-source /tmp/logger.sh
+source /opt/logger/logger.sh
 
 log_info "Starting user and group creation"
 

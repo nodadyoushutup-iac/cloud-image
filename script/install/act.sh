@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-source /tmp/logger.sh
+source /opt/logger/logger.sh
 
 VERSION="v0.2.69"
 ARCH="Linux_x86_64"

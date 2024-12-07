@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-source /tmp/logger.sh
+source /opt/logger/logger.sh
 
 log_info "Checking if Cloud-Init has completed"
 while [ ! -f /var/lib/cloud/instance/boot-finished ]; do

@@ -51,12 +51,12 @@ build {
   sources = ["source.qemu.ubuntu"]
 
   provisioner "file" {
-    source = "./file/logger.sh"
+    source      = "./file/logger.sh"
     destination = "/tmp/logger.sh"
   }
 
   provisioner "file" {
-    source = "./file/node_exporter.service"
+    source      = "./file/node_exporter.service"
     destination = "/tmp/node_exporter.service"
   }
 
@@ -65,6 +65,7 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
       "./script/cloud_init.sh",
+      "./script/logger.sh",
       "./script/install/apt.sh",
       "./script/install/docker.sh",
       "./script/install/act.sh",

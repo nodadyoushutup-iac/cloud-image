@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-source /tmp/logger.sh
+source /opt/logger/logger.sh
 
 log_info "Starting apt update, upgrade, and package installation..."
 
@@ -27,6 +27,7 @@ sudo apt-get install -y -qq \
     net-tools \
     nfs-common \
     nmap \
+    open-iscsi \
     postgresql-client \
     python3 \
     python3-pip \
