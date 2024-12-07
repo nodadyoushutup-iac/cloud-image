@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-source /opt/logger/logger.sh
+source /tmp/logger.sh
 
 log_info "Checking for curl..."
 if ! command -v curl &> /dev/null; then

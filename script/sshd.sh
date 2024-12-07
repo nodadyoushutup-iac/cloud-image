@@ -1,5 +1,7 @@
 #!/bin/bash -eu
 
+source /tmp/logger.sh
+
 if [ -f /tmp/sshd_config ]; then
     mv /tmp/sshd_config /etc/ssh/sshd_config
 else
