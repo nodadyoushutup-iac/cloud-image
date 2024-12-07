@@ -60,6 +60,11 @@ build {
     destination = "/tmp/node_exporter.service"
   }
 
+  provisioner "file" {
+    source      = "./file/sshd_config"
+    destination = "/etc/ssh/sshd_config"
+  }
+
   provisioner "shell" {
     execute_command = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
