@@ -51,11 +51,6 @@ build {
   sources = ["source.qemu.ubuntu"]
 
   provisioner "file" {
-    source      = "./file/logger.sh"
-    destination = "/tmp/logger.sh"
-  }
-
-  provisioner "file" {
     source      = "./file/node_exporter.service"
     destination = "/tmp/node_exporter.service"
   }
@@ -70,13 +65,12 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
       "./script/cloud_init.sh",
-      "./script/logger.sh",
       "./script/sshd.sh",
-      "./script/install/apt.sh",
-      "./script/install/docker.sh",
-      "./script/install/act.sh",
-      "./script/install/node_exporter.sh",
-      "./script/install/packer.sh",
+      "./script/apt.sh",
+      "./script/docker.sh",
+      "./script/act.sh",
+      "./script/node_exporter.sh",
+      "./script/packer.sh",
       "./script/user_group.sh",
       "./script/directory.sh",
       "./script/cleanup.sh"

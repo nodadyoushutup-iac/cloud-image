@@ -1,10 +1,8 @@
 #!/bin/bash -eu
 
-source /tmp/logger.sh
+echo "[INFO] Starting directory creation"
 
-log_info "Starting directory creation"
+echo "[INFO] Creating directory structure: /mnt/efs"
+mkdir -p /mnt/efs || echo "[ERROR] Failed to create directory /mnt/efs"
 
-log_info "Creating directory structure: /mnt/efs"
-mkdir -p /mnt/efs || log_error "Failed to create directory /mnt/efs"
-
-log_info "Directory creation completed successfully!"
+echo "[INFO] Directory creation completed successfully!"

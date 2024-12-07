@@ -1,8 +1,6 @@
 #!/bin/bash -eu
 
-source /tmp/logger.sh
-
-log_info "Configuring SSH"
+echo "[INFO] Configuring SSH"
 if [ -f /tmp/sshd_config ]; then
     mv /tmp/sshd_config /etc/ssh/sshd_config
 else
@@ -10,7 +8,7 @@ else
     exit 1
 fi
 
-log_info "Restarting SSH"
-systemctl restart sshd || log_error "Failed to restart SSH"
+echo "[INFO] Restarting SSH"
+systemctl restart sshd || echo "[ERROR] Failed to restart SSH"
 
 echo "SSH configuration completed"
