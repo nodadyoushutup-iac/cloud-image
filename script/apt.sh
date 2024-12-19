@@ -36,6 +36,7 @@ sudo apt-get install -y -qq \
     tcpdump \
     tmux \
     traceroute \
+    tree \
     unzip \
     vim \
     wget \
