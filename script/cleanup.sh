@@ -37,4 +37,13 @@ rm -f /root/.wget-hsts || echo "[ERROR] Failed to clear wget history"
 echo "[INFO] Clearing bash history environment variable"
 export HISTSIZE=0
 
+echo "[INFO] Changing group ID for packer to 62778"
+sudo groupmod -g 62778 packer || echo "[ERROR] Failed to change group ID for packer"
+
+echo "[INFO] Changing user ID for packer to 62778"
+sudo usermod -u 62778 -g 62778 packer || echo "[ERROR] Failed to change user ID/group for packer"
+
+echo "[INFO] Removing the password for packer user"
+sudo passwd -d packer || echo "[ERROR] Failed to remove password for packer user"
+
 echo "[INFO] System cleanup completed successfully!"
