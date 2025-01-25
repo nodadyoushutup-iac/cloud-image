@@ -3,7 +3,7 @@
 echo "[INFO] Starting system cleanup"
 
 echo "[INFO] Removing SSH keys used for building"
-rm -f /home/ubuntu/.ssh/authorized_keys /root/.ssh/authorized_keys || echo "[ERROR] Failed to remove SSH keys"
+rm -f /home/packer/.ssh/authorized_keys /root/.ssh/authorized_keys || echo "[ERROR] Failed to remove SSH keys"
 
 echo "[INFO] Clearing out machine ID"
 truncate -s 0 /etc/machine-id || echo "[ERROR] Failed to clear machine ID"
@@ -15,7 +15,7 @@ echo "[INFO] Truncating logs that have built up during the install"
 find /var/log -type f -exec truncate --size=0 {} \; || echo "[ERROR] Failed to truncate logs"
 
 echo "[INFO] Cleaning up bash history"
-rm -f /root/.bash_history /home/ubuntu/.bash_history || echo "[ERROR] Failed to clean up bash history"
+rm -f /root/.bash_history /home/packer/.bash_history || echo "[ERROR] Failed to clean up bash history"
 
 echo "[INFO] Removing /usr/share/doc contents"
 rm -rf /usr/share/doc/* || echo "[ERROR] Failed to remove /usr/share/doc contents"

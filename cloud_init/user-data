@@ -1,5 +1,5 @@
 #cloud-config
-password: ubuntu
+password: packer
 ssh_pwauth: true
 chpasswd:
   expire: false
