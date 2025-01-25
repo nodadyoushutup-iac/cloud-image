@@ -43,7 +43,7 @@ source "qemu" "ubuntu" {
   ]
   shutdown_command = "echo 'packer' | sudo -S shutdown -P now"
   ssh_private_key_file = "./id_rsa"
-  ssh_username = "packer"
+  ssh_username = "ubuntu"
   vm_name = "${var.file_name}.img"
 }
 
