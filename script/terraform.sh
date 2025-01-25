@@ -10,6 +10,10 @@ echo "$LOG_INFO Updating package lists and installing prerequisites..."
 sudo apt-get update -qq || echo "$LOG_ERROR Failed to update package lists."
 sudo apt-get install -y -qq gnupg software-properties-common || echo "$LOG_ERROR Failed to install prerequisites."
 
+if ! command -v wget &> /dev/null; then
+    echo "[ERROR] wget is required but not installed. Please install it and run the script again."
+fi
+
 # Step 2: Add HashiCorp GPG key
 echo "$LOG_INFO Adding HashiCorp GPG key..."
 wget -qO- https://apt.releases.hashicorp.com/gpg | \

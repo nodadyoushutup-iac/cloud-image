@@ -18,6 +18,10 @@ if ! id "node_exporter" &>/dev/null; then
     sudo useradd --system --no-create-home --shell /usr/sbin/nologin node_exporter || echo "[ERROR] Failed to create node_exporter user."
 fi
 
+if ! command -v wget &> /dev/null; then
+    echo "[ERROR] wget is required but not installed. Please install it and run the script again."
+fi
+
 echo "[INFO] Downloading node_exporter from ${URL}..."
 wget -q "${URL}" -O "/tmp/node_exporter.tar.gz" || echo "[ERROR] Failed to download node_exporter."
 
