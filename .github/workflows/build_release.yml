@@ -12,10 +12,10 @@ on:
       file_name:
         description: "File name"
         required: true
-        default: cloud_image_x86_64_jammy
+        default: cloud-image-x86-64-jammy
         type: choice
         options:
-          - cloud_image_x86_64_jammy
+          - cloud-image-x86-64-jammy
 
 env:
   PACKER_LOG: 1
@@ -31,15 +31,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # - name: Set environment variable with modified version
-      #   id: set_file_name
-      #   run: |
-      #     # Combine the provided file_name + version, then replace '.' with '_'
-      #     MODIFIED_FILE_NAME="${{ github.event.inputs.file_name }}_${{ github.event.inputs.version }}"
-      #     MODIFIED_FILE_NAME="$(echo "$MODIFIED_FILE_NAME" | sed 's/\./_/g')"
-
-      #     # Make this updated name available for all subsequent steps
-      #     echo "FILE_NAME=$MODIFIED_FILE_NAME" >> $GITHUB_ENV
+      - name: Set environment variable with modified version
+        id: set_file_name
+        run: |
+          MODIFIED_FILE_NAME="${{ github.event.inputs.file_name }}-${{ github.event.inputs.version }}"
+          echo "FILE_NAME=$MODIFIED_FILE_NAME" >> $GITHUB_ENV
 
       - name: Show resulting file name
         run: |
