@@ -55,17 +55,17 @@ build {
     destination = "/tmp/node_exporter.service"
   }
 
-  provisioner "file" {
-    source      = "./file/sshd_config"
-    destination = "/tmp/sshd_config"
-  }
+  # provisioner "file" {
+  #   source      = "./file/sshd_config"
+  #   destination = "/tmp/sshd_config"
+  # }
 
   provisioner "shell" {
     execute_command = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
       "./script/cloud_init.sh",
-      "./script/sshd.sh",
+      # "./script/sshd.sh",
       "./script/apt.sh",
       "./script/docker.sh",
       "./script/terraform.sh",
