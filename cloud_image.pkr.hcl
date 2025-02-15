@@ -73,6 +73,7 @@ build {
       "./script/act.sh",
       "./script/node_exporter.sh",
       "./script/packer.sh",
+      "./script/kubectl.sh",
       "./script/user_group.sh",
       "./script/directory.sh",
       "./script/cleanup.sh"
