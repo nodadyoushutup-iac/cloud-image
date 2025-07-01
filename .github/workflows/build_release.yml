@@ -40,7 +40,6 @@ jobs:
       - name: Show resulting file name
         run: |
           echo "Final FILE_NAME: $FILE_NAME"
-          echo "Final GH_TOKEN: $GH_TOKEN"
 
       - name: Checkout repository
         id: checkout_build
