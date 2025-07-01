@@ -69,7 +69,6 @@ build {
       "./script/apt.sh",
       "./script/docker.sh",
       "./script/ansible.sh",
-      "./script/act.sh",
       "./script/node_exporter.sh",
       "./script/packer.sh",
       "./script/kubectl.sh",
