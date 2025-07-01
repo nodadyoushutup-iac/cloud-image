@@ -65,6 +65,7 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
       "./script/cloud_init.sh",
+      "./script/apt.sh",
       "./script/cleanup.sh"
     ]
   }
