@@ -1,4 +1,4 @@
-#!/bin/bash -euo
+#!/bin/bash
 
 echo "[INFO] Installing qemu-guest-agent"
 sudo apt-get update
