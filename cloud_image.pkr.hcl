@@ -9,7 +9,7 @@ packer {
 
 variable "accelerator" {
   type        = string
-  default     = "none"
+  default     = "kvm"
   description = "QEMU accelerator"
 }
 
