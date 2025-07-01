@@ -50,7 +50,7 @@ jobs:
       - name: Install packages
         id: apt_install
         run: |
-          sudo apt-get update && sudo apt-get install -y jq qemu-system xorriso
+          sudo apt-get update && sudo apt-get install -y jq qemu-system xorriso unzip
 
       - name: Packer setup
         uses: hashicorp/setup-packer@main
