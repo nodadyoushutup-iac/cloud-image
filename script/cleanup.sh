@@ -1,4 +1,4 @@
-#!/bin/bash -euo pipefail
+#!/bin/bash
 
 echo "[INFO] Starting system cleanup"
 
