@@ -50,10 +50,10 @@ source "qemu" "ubuntu" {
 build {
   sources = ["source.qemu.ubuntu"]
 
-  provisioner "file" {
-    source      = "./file/node_exporter.service"
-    destination = "/tmp/node_exporter.service"
-  }
+  # provisioner "file" {
+  #   source      = "./file/node_exporter.service"
+  #   destination = "/tmp/node_exporter.service"
+  # }
 
   # provisioner "file" {
   #   source      = "./file/sshd_config"
@@ -68,8 +68,6 @@ build {
       # "./script/sshd.sh",
       "./script/apt.sh",
       "./script/docker.sh",
-      "./script/user_group.sh",
-      "./script/directory.sh",
       "./script/cleanup.sh"
     ]
   }
