@@ -1,7 +1,10 @@
 #!/bin/bash
 
-echo "[INFO] Upgrading apt packages"
+echo "[INFO] Updating apt packages"
+
 sudo apt-get update
+
+echo "[INFO] Upgrading apt packages"
 sudo apt-get install -y -qq \
     ca-certificates \
     curl \
