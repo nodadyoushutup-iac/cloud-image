@@ -1,4 +1,5 @@
-#!/bin/bash -euo pipefail
+#!/bin/bash
+set -euo pipefail
 
 echo "[INFO] Installing qemu-guest-agent"
 sudo apt-get update -qq
