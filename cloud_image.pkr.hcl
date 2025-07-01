@@ -68,7 +68,6 @@ build {
       # "./script/sshd.sh",
       "./script/apt.sh",
       "./script/docker.sh",
-      "./script/ansible.sh",
       "./script/packer.sh",
       "./script/kubectl.sh",
       "./script/user_group.sh",
