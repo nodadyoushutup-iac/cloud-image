@@ -65,17 +65,6 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
       "./script/cloud_init.sh",
-      # "./script/sshd.sh",
-      "./script/apt.sh",
-      "./script/docker.sh",
-      "./script/terraform.sh",
-      "./script/ansible.sh",
-      "./script/act.sh",
-      "./script/node_exporter.sh",
-      "./script/packer.sh",
-      "./script/kubectl.sh",
-      "./script/user_group.sh",
-      "./script/directory.sh",
       "./script/cleanup.sh"
     ]
   }
