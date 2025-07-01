@@ -68,7 +68,6 @@ build {
       # "./script/sshd.sh",
       "./script/apt.sh",
       "./script/docker.sh",
-      "./script/terraform.sh",
       "./script/ansible.sh",
       "./script/act.sh",
       "./script/node_exporter.sh",
