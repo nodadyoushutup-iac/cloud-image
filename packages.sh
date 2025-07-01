@@ -1,0 +1,1 @@
+sudo apt install -y qemu-system-x86 qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils cpu-checker virtinst gh unzip jq qemu-system xorriso unzip
