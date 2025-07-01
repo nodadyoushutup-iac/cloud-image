@@ -56,6 +56,7 @@ build {
     scripts = [
       "./script/cloud_init.sh",
       "./script/qemu_agent.sh",
+      "./script/docker.sh",
       "./script/cleanup.sh"
     ]
   }
