@@ -68,7 +68,6 @@ build {
       # "./script/sshd.sh",
       "./script/apt.sh",
       "./script/docker.sh",
-      "./script/packer.sh",
       "./script/user_group.sh",
       "./script/directory.sh",
       "./script/cleanup.sh"
