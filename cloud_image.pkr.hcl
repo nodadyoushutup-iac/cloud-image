@@ -56,7 +56,7 @@ build {
     scripts = [
       "./script/cloud_init.sh",
       "./script/qemu_agent.sh",
-      "./script/apt_upgrade.sh",
+      # "./script/apt_upgrade.sh",
       "./script/cleanup.sh"
     ]
   }
