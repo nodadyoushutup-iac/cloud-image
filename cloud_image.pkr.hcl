@@ -41,7 +41,7 @@ source "qemu" "ubuntu" {
     ["-smp", "2"],
     ["-serial", "mon:stdio"]
   ]
-  shutdown_command   = "echo 'packer' | sudo -S shutdown -P now"
+  shutdown_command   = "echo 'packer' | sudo -S sh -c 'rm -rf /var/lib/cloud && cloud-init clean && shutdown -P now'"
   ssh_private_key_file = "./.ssh/id_rsa"
   ssh_username       = "ubuntu"
   vm_name            = "${var.file_name}.img"
