@@ -22,6 +22,7 @@ env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   VERSION: "${{ github.event.inputs.version }}"
   FILE_NAME: ${{ github.event.inputs.file_name }}
+  CLOUD_REPOSITORY_URL: ${{ secrets.CLOUD_REPOSITORY_URL }}
 
 permissions:
   contents: write
@@ -91,29 +92,35 @@ jobs:
             output/${{ env.FILE_NAME }}.img
             output/${{ env.FILE_NAME }}.img.sha256
 
-      # CHANGE (1): Moved release steps from separate 'release' job to here
+      - name: Upload image to cloud repository
+        id: upload_img
+        run: |
+          response=$(curl -s -H "CLOUD-REPOSITORY-APIKEY: ${{ secrets.CLOUD_REPOSITORY_APIKEY }}" \
+                       -F "file=@output/${{ env.FILE_NAME }}.img" \
+                       ${{ env.CLOUD_REPOSITORY_URL }}/upload)
+          echo "response=$response" >> "$GITHUB_OUTPUT"
+
+      - name: Parse upload response
+        id: parse_response
+        run: |
+          IMAGE_PATH=$(echo '${{ steps.upload_img.outputs.response }}' | jq -r '.path')
+          SHA256_PATH=$(echo '${{ steps.upload_img.outputs.response }}' | jq -r '.sha256_file')
+          IMAGE_SHA=$(echo '${{ steps.upload_img.outputs.response }}' | jq -r '.sha256')
+          IMAGE_URL="${{ env.CLOUD_REPOSITORY_URL }}/$IMAGE_PATH"
+          SHA256_URL="${{ env.CLOUD_REPOSITORY_URL }}/$SHA256_PATH"
+          echo "image_url=$IMAGE_URL" >> "$GITHUB_OUTPUT"
+          echo "sha_url=$SHA256_URL" >> "$GITHUB_OUTPUT"
+          echo "sha=$IMAGE_SHA" >> "$GITHUB_OUTPUT"
+          cat <<EOF > release_notes.txt
+Image URL: $IMAGE_URL
+Checksum URL: $SHA256_URL
+SHA256: $IMAGE_SHA
+EOF
+
       - name: Create GitHub release
         id: release_create
         run: |
           echo "Creating release for tag: ${{ env.VERSION }}"
-          gh release create "${{ env.VERSION }}" --title "${{ env.VERSION }}" --notes "Automated release of the cloud image"
-
-      - name: Upload artifact to release
-        id: release_upload_artifact
-        run: |
-          if [[ ! -f "output/${{ env.FILE_NAME }}.img" ]]; then
-            echo "Error: Artifact not found: output/${{ env.FILE_NAME }}.img"
-            exit 1
-          fi
-          echo "Uploading artifact: output/${{ env.FILE_NAME }}.img"
-          gh release upload "${{ env.VERSION }}" "output/${{ env.FILE_NAME }}.img"
-
-      - name: Upload checksum to release
-        id: release_upload_checksum
-        run: |
-          if [[ ! -f "output/${{ env.FILE_NAME }}.img.sha256" ]]; then
-            echo "Error: Checksum file not found: output/${{ env.FILE_NAME }}.img.sha256"
-            exit 1
-          fi
-          echo "Uploading checksum: output/${{ env.FILE_NAME }}.img.sha256"
-          gh release upload "${{ env.VERSION }}" "output/${{ env.FILE_NAME }}.img.sha256"
+          gh release create "${{ env.VERSION }}" \
+            --title "${{ env.VERSION }}" \
+            --notes-file release_notes.txt
