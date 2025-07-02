@@ -27,13 +27,13 @@ sudo apt-get install -y -qq \
     containerd.io \
     docker-compose-plugin || echo "[ERROR] Failed to install Docker CE and related components."
 
-# echo "[INFO] Verifying Docker installation..."
-# if command -v docker &> /dev/null; then
-#     docker --version
+echo "[INFO] Verifying Docker installation..."
+if command -v docker &> /dev/null; then
+    docker --version
     
-#     echo "[INFO] Docker installed successfully!"
-# else
-#     echo "[ERROR] Docker installation failed."
-# fi
+    echo "[INFO] Docker installed successfully!"
+else
+    echo "[ERROR] Docker installation failed."
+fi
 
-# echo "[INFO] Docker CE installation complete!"
+echo "[INFO] Docker CE installation complete!"
