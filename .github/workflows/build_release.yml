@@ -112,10 +112,10 @@ jobs:
           echo "sha_url=$SHA256_URL" >> "$GITHUB_OUTPUT"
           echo "sha=$IMAGE_SHA" >> "$GITHUB_OUTPUT"
           cat <<EOF > release_notes.txt
-Image URL: $IMAGE_URL
-Checksum URL: $SHA256_URL
-SHA256: $IMAGE_SHA
-EOF
+          Image URL: $IMAGE_URL
+          Checksum URL: $SHA256_URL
+          SHA256: $IMAGE_SHA
+          EOF
 
       - name: Create GitHub release
         id: release_create
