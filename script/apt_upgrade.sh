@@ -21,11 +21,11 @@ echo \
 
 # # echo "[INFO] Installing Docker CE and related components..."
 sudo apt-get update -qq || echo "[ERROR] Failed to update package lists after adding Docker repository."
-# sudo apt-get install -y -qq \
-#     docker-ce \
-#     docker-ce-cli \
-#     containerd.io \
-#     docker-compose-plugin || echo "[ERROR] Failed to install Docker CE and related components."
+sudo apt-get install -y -qq \
+    docker-ce \
+    docker-ce-cli \
+    containerd.io \
+    docker-compose-plugin || echo "[ERROR] Failed to install Docker CE and related components."
 
 # echo "[INFO] Verifying Docker installation..."
 # if command -v docker &> /dev/null; then
