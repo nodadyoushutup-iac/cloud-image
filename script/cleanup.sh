@@ -36,5 +36,9 @@ rm -f /root/.wget-hsts
 
 echo "[INFO] Clearing bash history environment variable"
 export HISTSIZE=0
+
+echo "[INFO] Removing Cloud-Init state"
+rm -rf /var/lib/cloud
+cloud-init clean
 echo "[INFO] System cleanup completed successfully!"
 
