@@ -55,7 +55,7 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
       "./script/cloud_init.sh",
-      "./script/qemu_agent.sh",
+      "./script/apt.sh",
       "./script/cleanup.sh"
     ]
   }
