@@ -59,6 +59,7 @@ sudo apt-get install -y -qq \
     tree \
     ufw \
     unzip \
+    util-linux \
     vim \
     virtinst \
     wget \
