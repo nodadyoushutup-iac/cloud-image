@@ -26,7 +26,7 @@ find /var/cache -type f -exec rm -rf {} \;
 echo "[INFO] Cleaning up apt cache"
 sudo apt-get -y autoremove
 sudo apt-get clean
-sudo rm -rf /var/lib/apt/lists/*
+sudo rm -rf /var/lib/apt/lists/
 
 echo "[INFO] Forcing a new random seed to be generated"
 rm -f /var/lib/systemd/random-seed
