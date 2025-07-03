@@ -6,7 +6,8 @@ echo "[INFO] Updating apt cache..."
 sudo apt-get update
 
 echo "[INFO] Installing apt packages..."
-sudo apt-get install -y \
+sudo apt-get install -y -qq \
+    age \
     bat \
     bridge-utils \
     btop \
@@ -27,7 +28,6 @@ sudo apt-get install -y \
     libvirt-clients \
     libvirt-daemon-system \
     lshw \
-    lsblk \
     lsof \
     make \
     mysql-client-core-8.0 \
@@ -37,8 +37,6 @@ sudo apt-get install -y \
     neovim \
     nfs-common \
     nmap \
-    ncat \
-    nping \
     nvtop \
     open-iscsi \
     parted \
@@ -66,7 +64,6 @@ sudo apt-get install -y \
     wget \
     whois \
     xorriso \
-    yq \
     zip || echo "[ERROR] Failed to install one or more apt packages."
 
 
