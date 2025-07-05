@@ -55,8 +55,8 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline = [
       "mkdir -p /script",
+      "chown $USER:$USER /script",
       "ls -la / | grep script",
-      "chown root:root /script",
     ]
   }
 
