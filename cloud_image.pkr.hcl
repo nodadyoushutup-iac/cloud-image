@@ -64,6 +64,12 @@ build {
   }
 
   provisioner "shell" {
+    inline = [
+      "sudo chmod -R +x /script"
+    ]
+  }
+
+  provisioner "shell" {
     execute_command  = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
