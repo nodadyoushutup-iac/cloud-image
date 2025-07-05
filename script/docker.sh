@@ -11,7 +11,7 @@ sudo apt-get install -y \
     lsb-release
 
 echo "[INFO] Adding Docker's GPG key..."
-sudo mkdir -p /etc/apt/keyrings || echo "[ERROR] Failed to create /etc/apt/keyrings directory."
+sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
 echo "[INFO] Setting up the Docker repository..."
