@@ -50,18 +50,17 @@ source "qemu" "ubuntu" {
 build {
   sources = ["source.qemu.ubuntu"]
 
-  provisioner "file" {
-    source = "script/"
-    destination = "/tmp/script/register_github_public_key.sh.txt"
-  }
-
   provisioner "shell" {
     execute_command  = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline = [
       "mkdir -p /script",
-      "mv /tmp/script/* /script"
     ]
+  }
+
+  provisioner "file" {
+    source = "script/"
+    destination = "/script/register_github_public_key.sh.txt"
   }
 
   provisioner "shell" {
