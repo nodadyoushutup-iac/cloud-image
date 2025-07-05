@@ -50,11 +50,18 @@ source "qemu" "ubuntu" {
 build {
   sources = ["source.qemu.ubuntu"]
 
+  provisioner "file" {
+    source = "script/"
+    destination = "/tmp/script/register_github_public_key.sh.txt"
+  }
+
   provisioner "shell" {
     execute_command  = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
       "./script/cloud_init.sh",
+      "mkdir -p /script"
+      "mv /tmp/script/** /script"
       "./script/apt.sh",
       "./script/docker.sh",
       "./script/cleanup.sh"
