@@ -58,10 +58,17 @@ build {
   provisioner "shell" {
     execute_command  = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
+    inline = [
+      "mkdir -p /script",
+      "mv /tmp/script/* /script"
+    ]
+  }
+
+  provisioner "shell" {
+    execute_command  = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
+    environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
       "./script/cloud_init.sh",
-      "mkdir -p /script",
-      "mv /tmp/script/** /script",
       "./script/apt.sh",
       "./script/docker.sh",
       "./script/cleanup.sh"
