@@ -56,6 +56,7 @@ build {
     scripts = [
       "./script/cloud_init.sh",
       "./script/apt.sh",
+      "./script/docker.sh",
       "./script/cleanup.sh"
     ]
   }
