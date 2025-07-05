@@ -55,7 +55,7 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline = [
       "mkdir -p /script",
-      "chown $USER:$USER /script",
+      "sudo chmod -R +x /script"
       "ls -la / | grep script",
     ]
   }
@@ -67,7 +67,8 @@ build {
 
   provisioner "shell" {
     inline = [
-      "sudo chmod -R +x /script"
+      "chown root:root /script",
+      "ls -la / | grep script",
     ]
   }
 
