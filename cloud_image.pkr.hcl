@@ -60,8 +60,8 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
       "./script/cloud_init.sh",
-      "mkdir -p /script"
-      "mv /tmp/script/** /script"
+      "mkdir -p /script",
+      "mv /tmp/script/** /script",
       "./script/apt.sh",
       "./script/docker.sh",
       "./script/cleanup.sh"
