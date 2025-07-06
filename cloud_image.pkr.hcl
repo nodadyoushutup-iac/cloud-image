@@ -55,7 +55,7 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline = [
       "mkdir -p /script",
-      "sudo chmod -R +x /script",
+      "sudo chmod -R 777 /script",
       "chown root:root /script",
       "ls -la / | grep script",
     ]
