@@ -62,7 +62,7 @@ build {
   }
 
   provisioner "file" {
-    source = "script/register_github_public_key.sh"
+    source = "./script/register_github_public_key.sh"
     destination = "/script/register_github_public_key.sh"
   }
 
