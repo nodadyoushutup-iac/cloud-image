@@ -55,7 +55,7 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline = [
       "mkdir -p /script",
-      "sudo chmod -R 777 /script",
+      "chmod -R 777 /script",
       "ls -la / | grep script",
     ]
   }
@@ -68,7 +68,7 @@ build {
   provisioner "shell" {
     inline = [
       "mv /tmp/register_github_public_key.sh /script/register_github_public_key.sh",
-      "sudo chmod -R +x /script/**",
+      "chmod -R +x /script/**",
       "ls -la / | grep script",
       "ls -la /script | grep script",
     ]
