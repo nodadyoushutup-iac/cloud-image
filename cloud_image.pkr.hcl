@@ -55,7 +55,7 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline = [
       "mkdir -p /script",
-      "sudo chmod -R 777 /script",
+      "sudo chmod -R 660 /script",
       "chown root:root /script",
       "ls -la / | grep script",
     ]
@@ -63,12 +63,13 @@ build {
 
   provisioner "file" {
     source = "./script/register_github_public_key.sh"
-    destination = "/script/register_github_public_key.sh"
+    destination = "/tmp/register_github_public_key.sh"
   }
 
   provisioner "shell" {
     inline = [
-      "sudo chmod -R +x /script",
+      "mv /tmp/register_github_public_key.sh /script/register_github_public_key.sh"
+      "sudo chmod -R +x /script/**",
       "ls -la / | grep script",
       "ls -la /script | grep script",
     ]
