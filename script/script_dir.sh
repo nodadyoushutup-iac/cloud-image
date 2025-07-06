@@ -1,7 +1,7 @@
 echo "[INFO] Starting script_dir..."
 
 echo "[INFO] Creating /script dir..."
-sudo makedir -p /script
+sudo mkdir -p /script
 sudo ls -la / | grep script
 
 echo "[INFO] Setting /script permissions..."
