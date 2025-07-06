@@ -56,6 +56,7 @@ build {
     inline = [
       "mkdir -p /script",
       "sudo chmod -R +x /script"
+      "chown root:root /script",
       "ls -la / | grep script",
     ]
   }
@@ -67,8 +68,9 @@ build {
 
   provisioner "shell" {
     inline = [
-      "chown root:root /script",
+      "sudo chmod -R +x /script"
       "ls -la / | grep script",
+      "ls -la /script | grep script",
     ]
   }
 
