@@ -1,16 +1,10 @@
-#!/usr/bin/env bash
-# add_github_ssh_key.sh
-# Usage: add_github_ssh_key.sh <github_pat> [ssh_dir]
-# If GITHUB_PAT env var is set and no argument is given, it will be used.
-# Requires: uuidgen (from uuid-runtime package on Debian/Ubuntu)
-
-set -euo pipefail
+#!/bin/bash -eu
 
 # Get GitHub PAT from first argument or environment
 GITHUB_PAT="${1:-${GITHUB_PAT:-}}"
 
 # SSH directory defaults to ~/.ssh or second argument
-SSH_DIR="${2:-$HOME/.shh}"
+SSH_DIR="${2:-$HOME/.ssh}"
 
 # Validate PAT
 if [[ -z "$GITHUB_PAT" ]]; then
@@ -23,6 +17,10 @@ if ! command -v uuidgen &> /dev/null; then
   echo "Error: uuidgen not found. Install with: sudo apt update && sudo apt install -y uuid-runtime"
   exit 1
 fi
+
+# Determine local Linux username and hostname
+LOCAL_USER="$(id -un)"
+HOSTNAME="$(hostname)"
 
 # Pre-generate suffixes for naming consistency
 DATE_SUFFIX="$(date +%Y-%m-%d)"
@@ -38,7 +36,7 @@ if [[ -f "$SSH_DIR/id_ed25519.pub" ]]; then
 elif [[ -f "$SSH_DIR/id_rsa.pub" ]]; then
   PUB_KEY_FILE="$SSH_DIR/id_rsa.pub"
 else
-  KEY_NAME="id_ed25519-${DATE_SUFFIX}-${UUID_SUFFIX}"
+  KEY_NAME="${LOCAL_USER}@${HOSTNAME}-${DATE_SUFFIX}-${UUID_SUFFIX}"
   ssh-keygen -t ed25519 -f "$SSH_DIR/$KEY_NAME" -N "" -q
   PUB_KEY_FILE="$SSH_DIR/$KEY_NAME.pub"
   echo "Generated new SSH key at $SSH_DIR/$KEY_NAME"
@@ -58,8 +56,8 @@ if echo "$EXISTING_KEYS" | grep -Fq "$PUB_KEY_CONTENT"; then
   exit 0
 fi
 
-# Prepare payload for new key
-TITLE="$(hostname)-${DATE_SUFFIX}-${UUID_SUFFIX}"
+# Prepare payload for new key, including your local user@hostname in the title
+TITLE="${LOCAL_USER}@${HOSTNAME}-${DATE_SUFFIX}-${UUID_SUFFIX}"
 DATA=$(printf '{"title":"%s","key":"%s"}' "$TITLE" "$PUB_KEY_CONTENT")
 
 # Add the new SSH key via GitHub API

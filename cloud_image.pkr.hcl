@@ -51,7 +51,7 @@ build {
   sources = ["source.qemu.ubuntu"]
 
   provisioner "file" {
-    source = "./script/register_github_public_key.sh"
+    source = "./file/register_github_public_key.sh"
     destination = "/tmp/register_github_public_key.sh"
   }
 
