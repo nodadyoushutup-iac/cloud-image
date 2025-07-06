@@ -1,3 +1,5 @@
+#!/bin/bash -eu
+
 echo "[INFO] Starting script_dir..."
 
 echo "[INFO] Creating /script dir..."
