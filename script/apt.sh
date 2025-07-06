@@ -6,8 +6,7 @@ echo "[INFO] Updating apt cache..."
 sudo apt-get update
 
 echo "[INFO] Installing apt packages..."
-sudo apt-get install -y -qq \
-    age \
+sudo apt-get install -y \
     bat \
     bridge-utils \
     btop \
@@ -65,7 +64,7 @@ sudo apt-get install -y -qq \
     wget \
     whois \
     xorriso \
-    zip || echo "[ERROR] Failed to install one or more apt packages."
+    zip
 
 
 echo "[INFO] Upgrading apt packages..."
