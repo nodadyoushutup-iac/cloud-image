@@ -50,4 +50,4 @@ jobs:
           gh workflow run build_release.yml \
             --ref main \
             -f version="${{ steps.bump.outputs.new_tag }}" \
-            -f file_name="cloud-image-x86-64-jammy"
+            -f file_name="jammy-cloud-image-amd64"
