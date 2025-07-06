@@ -56,23 +56,11 @@ build {
   }
 
   provisioner "shell" {
-    inline = [
-      "makedir -p /script",
-      "ls -la / | grep script",
-      "chmod -R 777 /script",
-      "ls -la / | grep script",
-      "mv /tmp/register_github_public_key.sh /script/register_github_public_key.sh",
-      "chmod -R +x /script/**",
-      "ls -la / | grep script",
-      "ls -la /script | grep script",
-    ]
-  }
-
-  provisioner "shell" {
     execute_command  = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
       "./script/cloud_init.sh",
+      "./script/script_dir.sh",
       "./script/apt.sh",
       "./script/docker.sh",
       "./script/cleanup.sh"
