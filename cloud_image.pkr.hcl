@@ -50,29 +50,29 @@ source "qemu" "ubuntu" {
 build {
   sources = ["source.qemu.ubuntu"]
 
-  provisioner "shell" {
-    execute_command  = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
-    environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
-    inline = [
-      "mkdir -p /script",
-      "chmod -R 777 /script",
-      "ls -la / | grep script",
-    ]
-  }
+  # provisioner "shell" {
+  #   execute_command  = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
+  #   environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
+  #   inline = [
+  #     "mkdir -p /script",
+  #     "chmod -R 777 /script",
+  #     "ls -la / | grep script",
+  #   ]
+  # }
 
   provisioner "file" {
     source = "./script/register_github_public_key.sh"
     destination = "/tmp/register_github_public_key.sh"
   }
 
-  provisioner "shell" {
-    inline = [
-      "mv /tmp/register_github_public_key.sh /script/register_github_public_key.sh",
-      "chmod -R +x /script/**",
-      "ls -la / | grep script",
-      "ls -la /script | grep script",
-    ]
-  }
+  # provisioner "shell" {
+  #   inline = [
+  #     "mv /tmp/register_github_public_key.sh /script/register_github_public_key.sh",
+  #     "chmod -R +x /script/**",
+  #     "ls -la / | grep script",
+  #     "ls -la /script | grep script",
+  #   ]
+  # }
 
   provisioner "shell" {
     execute_command  = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
