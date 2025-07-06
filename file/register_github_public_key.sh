@@ -4,7 +4,7 @@
 GITHUB_PAT="${1:-${GITHUB_PAT:-}}"
 
 # SSH directory defaults to ~/.ssh or second argument
-SSH_DIR="${2:-$HOME/.shh}"
+SSH_DIR="${2:-$HOME/.ssh}"
 
 # Validate PAT
 if [[ -z "$GITHUB_PAT" ]]; then
