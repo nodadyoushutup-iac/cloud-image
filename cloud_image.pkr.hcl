@@ -55,8 +55,7 @@ build {
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     inline = [
       "mkdir -p /script",
-      "sudo chmod -R 660 /script",
-      "chown root:root /script",
+      "sudo chmod -R 777 /script",
       "ls -la / | grep script",
     ]
   }
@@ -70,6 +69,7 @@ build {
     inline = [
       "mv /tmp/register_github_public_key.sh /script/register_github_public_key.sh",
       "sudo chmod -R +x /script/**",
+      "chown -R root:root /script",
       "ls -la / | grep script",
       "ls -la /script | grep script",
     ]
