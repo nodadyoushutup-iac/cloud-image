@@ -13,9 +13,9 @@ if [[ -z "${CLOUD_REPOSITORY_APIKEY:-}" ]]; then
   exit 1
 fi
 
-echo "[INFO] Uploading '${FILE}' → ${DEST}"
+echo "[INFO] Uploading '${FILE}' → ${DEST}" >&2
 
-response="$(curl -# -S -H "CLOUD-REPOSITORY-APIKEY: ${CLOUD_REPOSITORY_APIKEY}" \
+response="$(curl -sS -H "CLOUD-REPOSITORY-APIKEY: ${CLOUD_REPOSITORY_APIKEY}" \
     -F "file=@${FILE}" \
     -w "\n%{http_code}" \
     "${DEST}" 2>&1)" || {
@@ -29,9 +29,10 @@ body="${response%$'\n'*}"
 echo "$body"
 
 if [[ "$http_code" =~ ^2 ]]; then
-  echo "[INFO] Upload succeeded (HTTP ${http_code})"
+  echo "[INFO] Upload succeeded (HTTP ${http_code})" >&2
   exit 0
 else
   echo "[ERROR] Upload failed (HTTP ${http_code})" >&2
   exit 1
 fi
+
