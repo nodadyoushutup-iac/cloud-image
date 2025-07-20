@@ -96,7 +96,7 @@ jobs:
           response=$(curl -s -H "CLOUD-REPOSITORY-APIKEY: ${{ secrets.CLOUD_REPOSITORY_APIKEY }}" \
                        -F "file=@output/${{ env.FILE_NAME }}.img" \
                        ${{ env.CLOUD_REPOSITORY_URL }}/upload)
-          echo "response=$response" >> "$GITHUB_OUTPUT"
+          printf 'response<<EOF\n%s\nEOF\n' "$response" >> "$GITHUB_OUTPUT"
 
       - name: Parse upload response
         id: parse_response
