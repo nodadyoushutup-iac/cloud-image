@@ -92,10 +92,10 @@ jobs:
 
       - name: Upload image to cloud repository
         id: upload_img
+        env:
+          CLOUD_REPOSITORY_APIKEY: ${{ secrets.CLOUD_REPOSITORY_APIKEY }}
         run: |
-          response=$(curl -s -H "CLOUD-REPOSITORY-APIKEY: ${{ secrets.CLOUD_REPOSITORY_APIKEY }}" \
-                       -F "file=@output/${{ env.FILE_NAME }}.img" \
-                       ${{ env.CLOUD_REPOSITORY_URL }}/upload)
+          response=$(./script/upload_image.sh "output/${{ env.FILE_NAME }}.img" "${{ env.CLOUD_REPOSITORY_URL }}/upload")
           printf 'response<<EOF\n%s\nEOF\n' "$response" >> "$GITHUB_OUTPUT"
 
       - name: Parse upload response
