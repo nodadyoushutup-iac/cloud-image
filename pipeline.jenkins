@@ -1,0 +1,91 @@
+pipeline {
+  agent any
+
+  parameters {
+    string(name: 'VERSION', description: 'Semantic version tag for the release')
+    choice(name: 'FILE_NAME', choices: ['jammy-cloud-image-amd64'], description: 'Base file name')
+  }
+
+  environment {
+    PACKER_LOG = '1'
+    // Expect CLOUD_REPOSITORY_URL to be provided via Jenkins credentials
+    CLOUD_REPOSITORY_URL = credentials('cloud-repository-url')
+  }
+
+  stages {
+    stage('Set build variables') {
+      steps {
+        script {
+          env.FILE_NAME = "${params.FILE_NAME}-${params.VERSION}"
+        }
+      }
+    }
+
+    stage('Show build variables') {
+      steps {
+        echo "Building version: ${params.VERSION}"
+        echo "Final FILE_NAME: ${env.FILE_NAME}"
+      }
+    }
+
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Packer init') {
+      steps {
+        sh 'packer init cloud_image.pkr.hcl'
+      }
+    }
+
+    stage('Packer validate') {
+      steps {
+        sh 'packer validate cloud_image.pkr.hcl'
+      }
+    }
+
+    stage('Packer build') {
+      steps {
+        sh '''
+          packer build \
+            -var="output_dir=output" \
+            -var="file_name=${FILE_NAME}" \
+            cloud_image.pkr.hcl
+        '''
+      }
+    }
+
+    stage('Generate checksum') {
+      steps {
+        sh '''
+          mkdir -p output
+          sha256sum output/${FILE_NAME}.img > output/${FILE_NAME}.img.sha256
+        '''
+      }
+    }
+
+    stage('Upload image to cloud repository') {
+      steps {
+        withCredentials([string(credentialsId: 'cloud-repository-apikey', variable: 'CLOUD_REPOSITORY_APIKEY')]) {
+          sh '''
+            response=$(./script/upload_image.sh "output/${FILE_NAME}.img" "${CLOUD_REPOSITORY_URL}/upload")
+            IMAGE_PATH=$(echo "$response" | jq -r '.path')
+            SHA256_PATH=$(echo "$response" | jq -r '.sha256_file')
+            IMAGE_SHA=$(echo "$response" | jq -r '.sha256')
+            echo "Image URL: ${CLOUD_REPOSITORY_URL}/$IMAGE_PATH"
+            echo "Checksum URL: ${CLOUD_REPOSITORY_URL}/$SHA256_PATH"
+            echo "SHA256: $IMAGE_SHA"
+          '''
+        }
+      }
+    }
+
+    stage('Archive artifacts') {
+      steps {
+        archiveArtifacts artifacts: "output/${FILE_NAME}.img, output/${FILE_NAME}.img.sha256", fingerprint: true
+      }
+    }
+  }
+}
