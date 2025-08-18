@@ -41,13 +41,13 @@ pipeline {
     //   }
     // }
 
-    // stage('Show build variables') {
-    //   steps {
-    //     echo "Building version: ${params.VERSION}"
-    //     echo "Final FILE_NAME: ${env.FILE_NAME}"
-    //     echo "OUTPUT_DIR: ${env.OUTPUT_DIR}"
-    //   }
-    // }
+    stage('Show build variables') {
+      steps {
+        echo "Building version: ${params.VERSION}"
+        echo "Final FILE_NAME: ${env.FILE_NAME}"
+        echo "OUTPUT_DIR: ${env.OUTPUT_DIR}"
+      }
+    }
 
     // stage('Checkout') {
     //   steps {
