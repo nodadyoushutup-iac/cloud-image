@@ -68,7 +68,7 @@ pipeline {
 
     stage('Upload image to cloud repository') {
       steps {
-        withCredentials([string(credentialsId: 'cloud-repository-apikey', variable: 'CLOUD_REPOSITORY_APIKEY')]) {
+        withCredentials([string(credentialsId: 'CLOUD_IMAGE_REPOSITORY_APIKEY', variable: 'CLOUD_IMAGE_REPOSITORY_APIKEY')]) {
           sh '''
             response=$(./script/upload_image.sh "output/${FILE_NAME}.img" "${CLOUD_IMAGE_REPOSITORY_URL}/upload")
             IMAGE_PATH=$(echo "$response" | jq -r '.path')
