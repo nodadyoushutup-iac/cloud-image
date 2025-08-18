@@ -32,14 +32,14 @@ pipeline {
       }
     }
 
-    // stage('Clean output directory') {
-    //   steps {
-    //     sh '''
-    //       set -euo
-    //       rm -rf "${OUTPUT_DIR}"
-    //     '''
-    //   }
-    // }
+    stage('Clean output directory') {
+      steps {
+        sh '''
+          set -euo
+          rm -rf "${OUTPUT_DIR}"
+        '''
+      }
+    }
 
     stage('Show build variables') {
       steps {
@@ -49,73 +49,73 @@ pipeline {
       }
     }
 
-    // stage('Checkout') {
-    //   steps {
-    //     checkout scm
-    //   }
-    // }
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
 
-    // stage('Packer init') {
-    //   steps {
-    //     sh 'packer init cloud_image.pkr.hcl'
-    //   }
-    // }
+    stage('Packer init') {
+      steps {
+        sh 'packer init cloud_image.pkr.hcl'
+      }
+    }
 
-    // stage('Packer validate') {
-    //   steps {
-    //     sh 'packer validate cloud_image.pkr.hcl'
-    //   }
-    // }
+    stage('Packer validate') {
+      steps {
+        sh 'packer validate cloud_image.pkr.hcl'
+      }
+    }
 
-    // stage('Packer build') {
-    //   steps {
-    //     sh '''
-    //       set -euo
-    //       mkdir -p "${OUTPUT_DIR}"
-    //       packer build \
-    //         -force \
-    //         -var="output_dir=${OUTPUT_DIR}" \
-    //         -var="file_name=${FILE_NAME}" \
-    //         cloud_image.pkr.hcl
-    //     '''
-    //   }
-    // }
+    stage('Packer build') {
+      steps {
+        sh '''
+          set -euo
+          mkdir -p "${OUTPUT_DIR}"
+          packer build \
+            -force \
+            -var="output_dir=${OUTPUT_DIR}" \
+            -var="file_name=${FILE_NAME}" \
+            cloud_image.pkr.hcl
+        '''
+      }
+    }
 
-    // stage('Generate checksum') {
-    //   steps {
-    //     sh '''
-    //       set -euo
-    //       mkdir -p "${OUTPUT_DIR}"
-    //       sha256sum "${OUTPUT_DIR}/${FILE_NAME}.img" > "${OUTPUT_DIR}/${FILE_NAME}.img.sha256"
-    //     '''
-    //   }
-    // }
+    stage('Generate checksum') {
+      steps {
+        sh '''
+          set -euo
+          mkdir -p "${OUTPUT_DIR}"
+          sha256sum "${OUTPUT_DIR}/${FILE_NAME}.img" > "${OUTPUT_DIR}/${FILE_NAME}.img.sha256"
+        '''
+      }
+    }
 
-    // stage('Upload image to cloud repository') {
-    //   steps {
-    //     withCredentials([string(credentialsId: 'CLOUD_IMAGE_REPOSITORY_APIKEY', variable: 'CLOUD_IMAGE_REPOSITORY_APIKEY')]) {
-    //       sh '''
-    //         set -euo
-    //         response=$(./script/upload_image.sh "${OUTPUT_DIR}/${FILE_NAME}.img" "${CLOUD_IMAGE_REPOSITORY_URL}/upload")
-    //         IMAGE_PATH=$(echo "$response" | jq -r '.path')
-    //         SHA256_PATH=$(echo "$response" | jq -r '.sha256_file')
-    //         IMAGE_SHA=$(echo "$response" | jq -r '.sha256')
-    //         echo "Image URL: ${CLOUD_IMAGE_REPOSITORY_URL}/$IMAGE_PATH"
-    //         echo "Checksum URL: ${CLOUD_IMAGE_REPOSITORY_URL}/$SHA256_PATH"
-    //         echo "SHA256: $IMAGE_SHA"
-    //       '''
-    //     }
-    //   }
-    // }
+    stage('Upload image to cloud repository') {
+      steps {
+        withCredentials([string(credentialsId: 'CLOUD_IMAGE_REPOSITORY_APIKEY', variable: 'CLOUD_IMAGE_REPOSITORY_APIKEY')]) {
+          sh '''
+            set -euo
+            response=$(./script/upload_image.sh "${OUTPUT_DIR}/${FILE_NAME}.img" "${CLOUD_IMAGE_REPOSITORY_URL}/upload")
+            IMAGE_PATH=$(echo "$response" | jq -r '.path')
+            SHA256_PATH=$(echo "$response" | jq -r '.sha256_file')
+            IMAGE_SHA=$(echo "$response" | jq -r '.sha256')
+            echo "Image URL: ${CLOUD_IMAGE_REPOSITORY_URL}/$IMAGE_PATH"
+            echo "Checksum URL: ${CLOUD_IMAGE_REPOSITORY_URL}/$SHA256_PATH"
+            echo "SHA256: $IMAGE_SHA"
+          '''
+        }
+      }
+    }
 
-    // stage('Archive artifacts (optional)') {
-    //   when {
-    //     expression { return params.RETAIN_ARTIFACTS }
-    //   }
-    //   steps {
-    //     archiveArtifacts artifacts: "${OUTPUT_DIR}/${FILE_NAME}.img, ${OUTPUT_DIR}/${FILE_NAME}.img.sha256", fingerprint: true
-    //   }
-    // }
+    stage('Archive artifacts (optional)') {
+      when {
+        expression { return params.RETAIN_ARTIFACTS }
+      }
+      steps {
+        archiveArtifacts artifacts: "${OUTPUT_DIR}/${FILE_NAME}.img, ${OUTPUT_DIR}/${FILE_NAME}.img.sha256", fingerprint: true
+      }
+    }
   }
 
   post {
