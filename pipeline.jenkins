@@ -32,6 +32,15 @@ pipeline {
       }
     }
 
+    stage('Clean output directory') {
+      steps {
+        sh '''
+          set -euo
+          rm -rf "${OUTPUT_DIR}"
+        '''
+      }
+    }
+
     stage('Show build variables') {
       steps {
         echo "Building version: ${params.VERSION}"
