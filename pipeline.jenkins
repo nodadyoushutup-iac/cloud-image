@@ -1,9 +1,18 @@
 pipeline {
   agent any
 
+  options {
+    ansiColor('xterm')
+    // Prevent parallel runs from sharing/holding onto the same workspace
+    disableConcurrentBuilds()
+    // Fail fast on stage errors (still runs post/cleanup)
+    skipStagesAfterUnstable()
+  }
+
   parameters {
     string(name: 'VERSION', description: 'Semantic version tag for the release')
     choice(name: 'FILE_NAME', choices: ['jammy-cloud-image-amd64'], description: 'Base file name')
+    booleanParam(name: 'RETAIN_ARTIFACTS', defaultValue: false, description: 'If true, archive artifacts; otherwise everything is ephemeral and cleaned in post { always }.')
   }
 
   environment {
@@ -17,6 +26,8 @@ pipeline {
       steps {
         script {
           env.FILE_NAME = "${params.FILE_NAME}-${params.VERSION}"
+          // Ensure packer output stays inside the workspace for guaranteed cleanup
+          env.OUTPUT_DIR = "${env.WORKSPACE}/output"
         }
       }
     }
@@ -25,6 +36,7 @@ pipeline {
       steps {
         echo "Building version: ${params.VERSION}"
         echo "Final FILE_NAME: ${env.FILE_NAME}"
+        echo "OUTPUT_DIR: ${env.OUTPUT_DIR}"
       }
     }
 
@@ -49,8 +61,10 @@ pipeline {
     stage('Packer build') {
       steps {
         sh '''
+          set -euo pipefail
+          mkdir -p "${OUTPUT_DIR}"
           packer build \
-            -var="output_dir=output" \
+            -var="output_dir=${OUTPUT_DIR}" \
             -var="file_name=${FILE_NAME}" \
             cloud_image.pkr.hcl
         '''
@@ -60,8 +74,9 @@ pipeline {
     stage('Generate checksum') {
       steps {
         sh '''
-          mkdir -p output
-          sha256sum output/${FILE_NAME}.img > output/${FILE_NAME}.img.sha256
+          set -euo pipefail
+          mkdir -p "${OUTPUT_DIR}"
+          sha256sum "${OUTPUT_DIR}/${FILE_NAME}.img" > "${OUTPUT_DIR}/${FILE_NAME}.img.sha256"
         '''
       }
     }
@@ -70,7 +85,8 @@ pipeline {
       steps {
         withCredentials([string(credentialsId: 'CLOUD_IMAGE_REPOSITORY_APIKEY', variable: 'CLOUD_IMAGE_REPOSITORY_APIKEY')]) {
           sh '''
-            response=$(./script/upload_image.sh "output/${FILE_NAME}.img" "${CLOUD_IMAGE_REPOSITORY_URL}/upload")
+            set -euo pipefail
+            response=$(./script/upload_image.sh "${OUTPUT_DIR}/${FILE_NAME}.img" "${CLOUD_IMAGE_REPOSITORY_URL}/upload")
             IMAGE_PATH=$(echo "$response" | jq -r '.path')
             SHA256_PATH=$(echo "$response" | jq -r '.sha256_file')
             IMAGE_SHA=$(echo "$response" | jq -r '.sha256')
@@ -82,10 +98,48 @@ pipeline {
       }
     }
 
-    stage('Archive artifacts') {
-      steps {
-        archiveArtifacts artifacts: "output/${FILE_NAME}.img, output/${FILE_NAME}.img.sha256", fingerprint: true
+    stage('Archive artifacts (optional)') {
+      when {
+        expression { return params.RETAIN_ARTIFACTS }
       }
+      steps {
+        archiveArtifacts artifacts: "${OUTPUT_DIR}/${FILE_NAME}.img, ${OUTPUT_DIR}/${FILE_NAME}.img.sha256", fingerprint: true
+      }
+    }
+  }
+
+  post {
+    // Runs on success, failure, or when the build is aborted/cancelled
+    always {
+      echo 'Post-build cleanup starting (ephemeral workspace).'        
+      script {
+        // Best-effort cleanup of files created during the pipeline
+        sh '''
+          set +e
+          # Remove generated outputs within the workspace
+          rm -rf "${OUTPUT_DIR}" || true
+
+          # Remove any common packer temp dirs within workspace
+          find "${WORKSPACE}" -maxdepth 1 -type d -name "packer_*" -exec rm -rf {} + 2>/dev/null || true
+
+          # Attempt to remove packer temp dirs under /tmp (best-effort)
+          if command -v find >/dev/null 2>&1; then
+            find /tmp -maxdepth 1 -type d -name "packer*" -mmin +10 -exec rm -rf {} + 2>/dev/null || true
+          fi
+        '''
+
+        // Wipe the entire workspace to ensure nothing persists between builds
+        deleteDir()
+      }
+      echo 'Post-build cleanup complete.'
+    }
+
+    failure {
+      echo 'Build failed. Workspace has been cleaned.'
+    }
+
+    aborted {
+      echo 'Build aborted. Workspace has been cleaned.'
     }
   }
 }
