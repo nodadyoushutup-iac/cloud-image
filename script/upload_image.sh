@@ -8,14 +8,14 @@ if [[ -z "$FILE" || ! -f "$FILE" ]]; then
   exit 1
 fi
 
-if [[ -z "${CLOUD_REPOSITORY_APIKEY:-}" ]]; then
-  echo "[ERROR] CLOUD_REPOSITORY_APIKEY environment variable not set" >&2
+if [[ -z "${CLOUD_IMAGE_REPOSITORY_APIKEY:-}" ]]; then
+  echo "[ERROR] CLOUD_IMAGE_REPOSITORY_APIKEY environment variable not set" >&2
   exit 1
 fi
 
 echo "[INFO] Uploading '${FILE}' → ${DEST}" >&2
 
-response="$(curl -sS -H "CLOUD-REPOSITORY-APIKEY: ${CLOUD_REPOSITORY_APIKEY}" \
+response="$(curl -sS -H "CLOUD-REPOSITORY-APIKEY: ${CLOUD_IMAGE_REPOSITORY_APIKEY}" \
     -F "file=@${FILE}" \
     -w "\n%{http_code}" \
     "${DEST}" 2>&1)" || {
