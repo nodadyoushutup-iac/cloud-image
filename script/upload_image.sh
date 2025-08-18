@@ -1,7 +1,7 @@
 #!/bin/bash -eu
 
 FILE="$1"
-DEST="${2:-$CLOUD_REPOSITORY_URL/upload}"
+DEST="${2:-$CLOUD_IMAGE_REPOSITORY_URL/upload}"
 
 if [[ -z "$FILE" || ! -f "$FILE" ]]; then
   echo "[ERROR] File not found: $FILE" >&2
