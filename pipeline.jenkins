@@ -61,7 +61,7 @@ pipeline {
     stage('Packer build') {
       steps {
         sh '''
-          set -euo pipefail
+          set -euo
           mkdir -p "${OUTPUT_DIR}"
           packer build \
             -var="output_dir=${OUTPUT_DIR}" \
@@ -74,7 +74,7 @@ pipeline {
     stage('Generate checksum') {
       steps {
         sh '''
-          set -euo pipefail
+          set -euo
           mkdir -p "${OUTPUT_DIR}"
           sha256sum "${OUTPUT_DIR}/${FILE_NAME}.img" > "${OUTPUT_DIR}/${FILE_NAME}.img.sha256"
         '''
@@ -85,7 +85,7 @@ pipeline {
       steps {
         withCredentials([string(credentialsId: 'CLOUD_IMAGE_REPOSITORY_APIKEY', variable: 'CLOUD_IMAGE_REPOSITORY_APIKEY')]) {
           sh '''
-            set -euo pipefail
+            set -euo
             response=$(./script/upload_image.sh "${OUTPUT_DIR}/${FILE_NAME}.img" "${CLOUD_IMAGE_REPOSITORY_URL}/upload")
             IMAGE_PATH=$(echo "$response" | jq -r '.path')
             SHA256_PATH=$(echo "$response" | jq -r '.sha256_file')
