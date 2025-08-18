@@ -8,8 +8,8 @@ pipeline {
 
   environment {
     PACKER_LOG = '1'
-    // Expect CLOUD_REPOSITORY_URL to be provided via Jenkins credentials
-    CLOUD_REPOSITORY_URL = credentials('cloud-repository-url')
+    // Expect CLOUD_IMAGE_REPOSITORY_URL to be provided via Jenkins credentials
+    CLOUD_IMAGE_REPOSITORY_URL = credentials('CLOUD_IMAGE_REPOSITORY_URL')
   }
 
   stages {
@@ -70,12 +70,12 @@ pipeline {
       steps {
         withCredentials([string(credentialsId: 'cloud-repository-apikey', variable: 'CLOUD_REPOSITORY_APIKEY')]) {
           sh '''
-            response=$(./script/upload_image.sh "output/${FILE_NAME}.img" "${CLOUD_REPOSITORY_URL}/upload")
+            response=$(./script/upload_image.sh "output/${FILE_NAME}.img" "${CLOUD_IMAGE_REPOSITORY_URL}/upload")
             IMAGE_PATH=$(echo "$response" | jq -r '.path')
             SHA256_PATH=$(echo "$response" | jq -r '.sha256_file')
             IMAGE_SHA=$(echo "$response" | jq -r '.sha256')
-            echo "Image URL: ${CLOUD_REPOSITORY_URL}/$IMAGE_PATH"
-            echo "Checksum URL: ${CLOUD_REPOSITORY_URL}/$SHA256_PATH"
+            echo "Image URL: ${CLOUD_IMAGE_REPOSITORY_URL}/$IMAGE_PATH"
+            echo "Checksum URL: ${CLOUD_IMAGE_REPOSITORY_URL}/$SHA256_PATH"
             echo "SHA256: $IMAGE_SHA"
           '''
         }
