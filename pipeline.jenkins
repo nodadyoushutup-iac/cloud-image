@@ -73,6 +73,7 @@ pipeline {
           set -euo
           mkdir -p "${OUTPUT_DIR}"
           packer build \
+            -force \
             -var="output_dir=${OUTPUT_DIR}" \
             -var="file_name=${FILE_NAME}" \
             cloud_image.pkr.hcl
