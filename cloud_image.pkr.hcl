@@ -63,6 +63,12 @@ build {
       "./script/script_dir.sh",
       "./script/apt.sh",
       "./script/docker.sh",
+      "./script/kubectl.sh",
+      "./script/packer.sh",
+      "./script/terraform.sh",
+      "./script/node_exporter.sh",
+      "./script/ansible.sh",
+      "./script/yq.sh",
       "./script/cleanup.sh"
     ]
   }
