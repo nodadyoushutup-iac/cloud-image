@@ -64,6 +64,7 @@ build {
       "./script/apt.sh",
       "./script/docker.sh",
       "./script/kubectl.sh",
+      "./script/k9s.sh",
       "./script/packer.sh",
       "./script/terraform.sh",
       "./script/node_exporter.sh",
