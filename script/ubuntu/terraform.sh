@@ -141,17 +141,30 @@ install_via_releases() {
 }
 
 install_completions_best_effort() {
-  # Terraform can self-install completions for bash/zsh
-  if command -v "${BIN}" >/dev/null 2>&1; then
-    # Try to install for current user (best effort; harmless if it fails)
-    "${BIN}" -install-autocomplete >/dev/null 2>&1 || true
-    # If system dirs exist, also populate vendor locations
-    if [[ -d /etc/bash_completion.d ]]; then
-      "${BIN}" -autocomplete-bash | sudo tee /etc/bash_completion.d/terraform >/dev/null || true
-    fi
-    if [[ -d /usr/share/zsh/vendor-completions ]]; then
-      "${BIN}" -autocomplete-zsh | sudo tee /usr/share/zsh/vendor-completions/_terraform >/dev/null || true
-    fi
+  if ! command -v "${BIN}" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  # Have Terraform drop its user-level config (best effort)
+  "${BIN}" -install-autocomplete >/dev/null 2>&1 || true
+
+  local terraform_path completion_cmd
+  terraform_path="$(command -v "${BIN}")"
+  printf -v completion_cmd 'complete -C %q terraform' "${terraform_path}"
+
+  if [[ -d /etc/bash_completion.d ]]; then
+    log "Installing bash completion to /etc/bash_completion.d/terraform"
+    printf '%s\n' "${completion_cmd}" \
+      | sudo tee /etc/bash_completion.d/terraform >/dev/null || true
+  fi
+
+  if [[ -d /usr/share/zsh/vendor-completions ]]; then
+    log "Installing zsh completion shim to /usr/share/zsh/vendor-completions/_terraform"
+    sudo tee /usr/share/zsh/vendor-completions/_terraform >/dev/null <<EOF || true
+#compdef terraform
+autoload -U +X bashcompinit && bashcompinit
+${completion_cmd}
+EOF
   fi
 }
 
