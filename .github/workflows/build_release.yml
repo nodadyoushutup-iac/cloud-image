@@ -48,7 +48,7 @@ jobs:
 
       - name: Checkout repository
         id: checkout_build
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -107,7 +107,7 @@ jobs:
           echo "FILE_NAME=${{ needs.build.outputs.file_name }}" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
