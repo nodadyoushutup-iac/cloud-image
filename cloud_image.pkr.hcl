@@ -59,18 +59,18 @@ build {
     execute_command  = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     environment_vars = ["DEBIAN_FRONTEND=noninteractive"]
     scripts = [
-      "./script/cloud_init.sh",
-      "./script/script_dir.sh",
-      "./script/apt.sh",
-      "./script/docker.sh",
-      "./script/kubectl.sh",
-      "./script/k9s.sh",
-      "./script/packer.sh",
-      "./script/terraform.sh",
-      "./script/node_exporter.sh",
-      "./script/ansible.sh",
-      "./script/yq.sh",
-      "./script/cleanup.sh"
+      "./script/cloud/cloud_init.sh",
+      "./script/cloud/script_dir.sh",
+      "./script/ubuntu/apt.sh",
+      "./script/ubuntu/docker.sh",
+      "./script/ubuntu/kubectl.sh",
+      "./script/ubuntu/k9s.sh",
+      "./script/ubuntu/packer.sh",
+      "./script/ubuntu/terraform.sh",
+      "./script/ubuntu/node_exporter.sh",
+      "./script/ubuntu/ansible.sh",
+      "./script/ubuntu/yq.sh",
+      "./script/cloud/cleanup.sh"
     ]
   }
 }
