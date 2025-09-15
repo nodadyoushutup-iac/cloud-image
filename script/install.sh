@@ -1,0 +1,9 @@
+sudo ./ubuntu/apt.sh
+sudo ./ubuntu/docker.sh
+sudo ./ubuntu/kubectl.sh
+sudo ./ubuntu/k9s.sh
+sudo ./ubuntu/packer.sh
+sudo ./ubuntu/terraform.sh
+sudo ./ubuntu/node_exporter.sh
+sudo ./ubuntu/ansible.sh
+sudo ./ubuntu/yq.sh
