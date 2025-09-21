@@ -13,33 +13,24 @@ while [ -L "$SOURCE" ]; do
   [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
 done
 ROOT="$(cd -P "$(dirname "$SOURCE")" && pwd)"
-UBUNTU_DIR="$ROOT/ubuntu"
+SYSTEM_DIR="$ROOT/system"
 
-# Scripts to run (order matters)
-SCRIPTS=(apt docker kubectl k9s packer terraform node_exporter ansible yq)
-
-# Allow running a subset: ./run-all.sh docker kubectl
-if (( $# )); then
-  SCRIPTS=("$@")
-fi
-
-# Ensure they’re executable
-chmod +x "$UBUNTU_DIR"/*.sh
-
-run_step() {
+run_system_script() {
   local name="$1"
-  local path="$UBUNTU_DIR/$name.sh"
+  shift || true
+  local path="$SYSTEM_DIR/$name.sh"
   [[ -f "$path" ]] || die "missing script: $path"
   log "running $path ..."
   if (( EUID == 0 )); then
-    "$path"
+    "$path" "$@"
   else
-    sudo "$path"
+    sudo "$path" "$@"
   fi
 }
 
-for s in "${SCRIPTS[@]}"; do
-  run_step "$s"
-done
+PACKAGE_ARGS=("$@")
+run_system_script packages "${PACKAGE_ARGS[@]}"
+run_system_script swap_gpio
+run_system_script fstab
 
 log "all done."
