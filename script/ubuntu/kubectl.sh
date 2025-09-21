@@ -13,6 +13,29 @@ OS="linux"
 # Allow: KUBECTL_VERSION=v1.31.2 ./install-kubectl.sh
 KUBECTL_VERSION="${KUBECTL_VERSION:-}"
 
+fetch_latest_stable_version() {
+  local urls=(
+    "https://dl.k8s.io/release/stable.txt"
+    "https://storage.googleapis.com/kubernetes-release/release/stable.txt"
+  )
+  local url version
+
+  for url in "${urls[@]}"; do
+    if version="$(curl -fsSL --retry 3 --retry-connrefused --retry-delay 2 "$url" 2>/dev/null)"; then
+      version="$(printf '%s' "$version" | tr -d '\r\n')"
+      if [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "$version"
+        return 0
+      fi
+      warn "Unexpected kubectl version string '$version' from $url"
+    else
+      warn "Failed to query kubectl version from $url"
+    fi
+  done
+
+  return 1
+}
+
 # --- Preflight ---
 command -v curl >/dev/null 2>&1 || die "curl is required (apt-get install -y curl)."
 command -v sha256sum >/dev/null 2>&1 || die "sha256sum is required (part of coreutils)."
@@ -35,7 +58,9 @@ esac
 # --- Resolve desired version ---
 if [[ -z "$KUBECTL_VERSION" ]]; then
   log "Querying latest stable kubectl version..."
-  KUBECTL_VERSION="$(curl -fsSL --retry 3 https://dl.k8s.io/release/stable.txt)" || die "Unable to fetch stable kubectl version."
+  if ! KUBECTL_VERSION="$(fetch_latest_stable_version)"; then
+    die "Unable to fetch stable kubectl version."
+  fi
 fi
 [[ "$KUBECTL_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "Invalid version string: '${KUBECTL_VERSION}'"
 
@@ -45,9 +70,7 @@ SHA_URL="${BIN_URL}.sha256"
 
 # --- Skip if already at target version ---
 if command -v "${BINARY_NAME}" >/dev/null 2>&1; then
-  set +e
-  CURRENT_VER="$(${BINARY_NAME} version --client --short 2>/dev/null | sed -n 's/^Client Version: //p')"
-  set -e
+  CURRENT_VER="$(${BINARY_NAME} version --client 2>/dev/null | sed -n 's/^Client Version: //p' | head -n1 || true)"
   if [[ -n "${CURRENT_VER:-}" && "${CURRENT_VER}" == "${KUBECTL_VERSION}" ]]; then
     log "kubectl ${CURRENT_VER} already installed at $(command -v kubectl); nothing to do."
     exit 0
