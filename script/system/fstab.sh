@@ -18,6 +18,8 @@ SRC_JENKINS="/mnt/eapp/skel/.jenkins"
 SRC_HOME="/mnt/eapp/skel/.home"
 SRC_GITCONFIG="$SRC_HOME/.gitconfig"
 
+FSTAB_FILE="/etc/fstab"
+
 FSTAB_D_DIR="/etc/fstab.d"
 FSTAB_DROPIN="$FSTAB_D_DIR/99-eapp-nfs.conf"
 NFS_OPTIONS="nfs defaults,_netdev 0 0"
@@ -55,12 +57,95 @@ ensure_fstab_dropin() {
   rm -f "$tmp"
 }
 
+ensure_mount_extra_directive() {
+  local directive="x-systemd.mount-extra=$FSTAB_D_DIR"
+
+  if [[ ! -f "$FSTAB_FILE" ]]; then
+    echo "Warning: missing $FSTAB_FILE; cannot configure mount-extra directive" >&2
+    return 1
+  fi
+
+  if grep -q "${directive//\//\/}" "$FSTAB_FILE"; then
+    return 0
+  fi
+
+  python3 - "$FSTAB_FILE" "$directive" <<'PY'
+import pathlib
+import sys
+
+fstab_path = pathlib.Path(sys.argv[1])
+directive = sys.argv[2]
+lines = fstab_path.read_text().splitlines()
+changed = False
+found_root = False
+
+for idx, line in enumerate(lines):
+    stripped = line.strip()
+    if not stripped or stripped.startswith('#'):
+        continue
+
+    parts = stripped.split()
+    if len(parts) < 4:
+        continue
+
+    if parts[1] != '/':
+        continue
+
+    found_root = True
+    options = parts[3]
+
+    if directive in options.split(','):
+        break
+
+    if options in ('', '-'):
+        new_options = directive
+    else:
+        new_options = options.rstrip(',') + ',' + directive
+
+    prefix, suffix = line.split(options, 1)
+    lines[idx] = prefix + new_options + suffix
+    changed = True
+    break
+
+if changed:
+    fstab_path.write_text('\n'.join(lines) + '\n')
+elif not found_root:
+    sys.stderr.write('Warning: unable to locate root (/) entry in %s to set %s\n' % (fstab_path, directive))
+PY
+}
+
 ensure_mountpoint() {
   local dir="$1"
   install -d -m 755 -o root -g root "$dir"
 }
 
 ensure_fstab_dropin
+ensure_mount_extra_directive
+
+SYSTEMD_AVAILABLE=0
+if command -v systemctl >/dev/null 2>&1 && command -v systemd-escape >/dev/null 2>&1; then
+  if systemctl daemon-reload >/dev/null 2>&1; then
+    SYSTEMD_AVAILABLE=1
+  else
+    echo "Warning: systemctl daemon-reload failed; falling back to mount command" >&2
+  fi
+fi
+
+systemd_mount_entry() {
+  local dest="$1"
+  (( SYSTEMD_AVAILABLE )) || return 1
+
+  local unit
+  if ! unit="$(systemd-escape -p --suffix=mount "$dest")"; then
+    return 1
+  fi
+
+  if systemctl start "$unit" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  return 1
+}
 
 for entry in "${NFS_ENTRIES[@]}"; do
   read -r _ dest <<<"$entry"
@@ -72,9 +157,13 @@ for entry in "${NFS_ENTRIES[@]}"; do
   if mountpoint -q "$dest"; then
     continue
   fi
-  if ! mount "$dest"; then
-    echo "Warning: failed to mount $src on $dest" >&2
+  if systemd_mount_entry "$dest"; then
+    continue
   fi
+  if mount "$dest"; then
+    continue
+  fi
+  echo "Warning: failed to mount $src on $dest" >&2
 done
 
 # Ensure backing directories exist (avoids failing on first run)
