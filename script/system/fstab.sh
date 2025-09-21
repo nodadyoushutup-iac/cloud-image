@@ -3,6 +3,12 @@
 
 TARGET_USER="${SUDO_USER:-$USER}"
 TARGET_HOME="$(eval echo "~$TARGET_USER")"
+TARGET_GROUP="$(id -gn "$TARGET_USER")"
+
+if [[ -z "$TARGET_GROUP" ]]; then
+  echo "Unable to determine primary group for $TARGET_USER" >&2
+  exit 1
+fi
 
 SRC_SSH="/mnt/eapp/skel/.ssh"
 SRC_KUBE="/mnt/eapp/skel/.kube"
@@ -18,8 +24,10 @@ ensure_src_dir() {
     exit 1
   fi
   if [[ ! -d "$dir" ]]; then
-    install -d -m "$perm" "$dir"
+    install -d -m "$perm" -o "$TARGET_USER" -g "$TARGET_GROUP" "$dir"
   fi
+  chown "$TARGET_USER:$TARGET_GROUP" "$dir"
+  chmod "$perm" "$dir"
 }
 
 ensure_src_dir "$SRC_SSH" 700

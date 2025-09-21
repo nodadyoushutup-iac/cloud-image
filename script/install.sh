@@ -30,6 +30,7 @@ run_system_script() {
 
 PACKAGE_ARGS=("$@")
 run_system_script packages "${PACKAGE_ARGS[@]}"
+# Run swap_gpio ahead of fstab so user/group IDs are correct before chowning mounts.
 run_system_script swap_gpio
 run_system_script fstab
 
