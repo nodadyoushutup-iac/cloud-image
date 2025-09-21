@@ -10,6 +10,24 @@ SRC_TFVARS="/mnt/eapp/skel/.tfvars"
 SRC_JENKINS="/mnt/eapp/skel/.jenkins"
 SRC_GITCONFIG="/mnt/eapp/skel/.home/.gitconfig"
 
+# Ensure backing directories exist (avoids failing on first run)
+ensure_src_dir() {
+  local dir="$1" perm="$2"
+  if [[ -e "$dir" && ! -d "$dir" ]]; then
+    echo "Expected directory at $dir but found a file" >&2
+    exit 1
+  fi
+  if [[ ! -d "$dir" ]]; then
+    install -d -m "$perm" "$dir"
+  fi
+}
+
+ensure_src_dir "$SRC_SSH" 700
+ensure_src_dir "$SRC_KUBE" 755
+ensure_src_dir "$SRC_TFVARS" 755
+ensure_src_dir "$SRC_JENKINS" 755
+ensure_src_dir "$(dirname "$SRC_GITCONFIG")" 755
+
 # Basic exists checks (also triggers automounts)
 for p in "$SRC_SSH" "$SRC_KUBE" "$SRC_TFVARS" "$SRC_JENKINS"; do
   [[ -d "$p" ]] || { echo "Missing: $p"; exit 1; }
