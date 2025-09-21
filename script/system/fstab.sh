@@ -19,9 +19,6 @@ SRC_HOME="/mnt/eapp/skel/.home"
 SRC_GITCONFIG="$SRC_HOME/.gitconfig"
 
 FSTAB_FILE="/etc/fstab"
-
-FSTAB_D_DIR="/etc/fstab.d"
-FSTAB_DROPIN="$FSTAB_D_DIR/99-eapp-nfs.conf"
 NFS_TYPE="nfs"
 NFS_MOUNT_OPTIONS="defaults,_netdev"
 NFS_DUMP=0
@@ -41,80 +38,79 @@ declare -a NFS_ENTRIES=(
   "192.168.1.100:/mnt/eapp/skel/.jenkins $SRC_JENKINS"
 )
 
-ensure_fstab_dropin() {
-  install -d -m 755 -o root -g root "$FSTAB_D_DIR"
-
-  local tmp
-  tmp="$(mktemp)"
-  {
-    echo "$FSTAB_HEADER"
-    for entry in "${NFS_ENTRIES[@]}"; do
-      read -r src dest <<<"$entry"
-      printf '%s %s %s %s %s %s\n' \
-        "$src" "$dest" "$NFS_TYPE" "$NFS_MOUNT_OPTIONS" "$NFS_DUMP" "$NFS_PASS"
-    done
-  } >"$tmp"
-
-  if [[ ! -f "$FSTAB_DROPIN" ]] || ! cmp -s "$tmp" "$FSTAB_DROPIN"; then
-    install -m 644 -o root -g root "$tmp" "$FSTAB_DROPIN"
-  fi
-  rm -f "$tmp"
-}
-
-ensure_mount_extra_directive() {
-  local directive="x-systemd.mount-extra=$FSTAB_D_DIR"
-
+ensure_fstab_entries() {
   if [[ ! -f "$FSTAB_FILE" ]]; then
-    echo "Warning: missing $FSTAB_FILE; cannot configure mount-extra directive" >&2
-    return 1
+    install -m 644 -o root -g root /dev/null "$FSTAB_FILE"
   fi
 
-  if grep -q "${directive//\//\/}" "$FSTAB_FILE"; then
-    return 0
-  fi
-
-  python3 - "$FSTAB_FILE" "$directive" <<'PY'
+  printf '%s\n' "${NFS_ENTRIES[@]}" | python3 - \
+    "$FSTAB_FILE" \
+    "$FSTAB_HEADER" \
+    "$NFS_TYPE" \
+    "$NFS_MOUNT_OPTIONS" \
+    "$NFS_DUMP" \
+    "$NFS_PASS" <<'PY'
 import pathlib
 import sys
 
 fstab_path = pathlib.Path(sys.argv[1])
-directive = sys.argv[2]
-lines = fstab_path.read_text().splitlines()
+header = sys.argv[2].strip()
+fs_type = sys.argv[3]
+options = sys.argv[4]
+dump = sys.argv[5]
+passno = sys.argv[6]
+
+desired = {}
+for raw in sys.stdin:
+    raw = raw.strip()
+    if not raw:
+        continue
+    src, dest = raw.split(None, 1)
+    desired[dest] = f"{src} {dest} {fs_type} {options} {dump} {passno}"
+
+if not desired:
+    sys.exit(0)
+
+if fstab_path.exists():
+    lines = fstab_path.read_text().splitlines()
+else:
+    lines = []
+
 changed = False
-found_root = False
+present = set()
+header_present = any(line.strip() == header for line in lines)
 
 for idx, line in enumerate(lines):
     stripped = line.strip()
     if not stripped or stripped.startswith('#'):
         continue
-
     parts = stripped.split()
-    if len(parts) < 4:
+    if len(parts) < 2:
         continue
-
-    if parts[1] != '/':
+    dest = parts[1]
+    if dest not in desired:
         continue
+    desired_line = desired[dest]
+    if stripped != desired_line:
+        lines[idx] = desired_line
+        changed = True
+    present.add(dest)
 
-    found_root = True
-    options = parts[3]
+missing = [dest for dest in desired if dest not in present]
 
-    if directive in options.split(','):
-        break
-
-    if options in ('', '-'):
-        new_options = directive
-    else:
-        new_options = options.rstrip(',') + ',' + directive
-
-    prefix, suffix = line.split(options, 1)
-    lines[idx] = prefix + new_options + suffix
-    changed = True
-    break
+if missing:
+    if not header_present:
+        if lines and lines[-1].strip():
+            lines.append('')
+        lines.append(header)
+        header_present = True
+        changed = True
+    for dest in missing:
+        lines.append(desired[dest])
+        changed = True
 
 if changed:
     fstab_path.write_text('\n'.join(lines) + '\n')
-elif not found_root:
-    sys.stderr.write('Warning: unable to locate root (/) entry in %s to set %s\n' % (fstab_path, directive))
 PY
 }
 
@@ -123,8 +119,7 @@ ensure_mountpoint() {
   install -d -m 755 -o root -g root "$dir"
 }
 
-ensure_fstab_dropin
-ensure_mount_extra_directive
+ensure_fstab_entries
 
 SYSTEMD_AVAILABLE=0
 if command -v systemctl >/dev/null 2>&1 && command -v systemd-escape >/dev/null 2>&1; then
